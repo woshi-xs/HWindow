@@ -1,0 +1,19 @@
+# 忽略 CMake 编译输出目录
+build/
+bin/
+out/
+
+# 忽略 IDE 产生的临时文件
+.vs/
+.vscode/
+*.sln
+*.vcxproj
+*.user
+
+# 忽略编译生成的中间文件
+*.obj
+*.exe
+*.pdb
+*.ilk
+*.lib
+*.dll
