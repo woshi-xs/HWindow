@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>images/cat.jpg</file>
+        <file>images/bell-fill.svg</file>
+        <file>images/bell-line.svg</file>
+        <file>images/chat-fill.svg</file>
+        <file>images/chat-line.svg</file>
+        <file>images/disc-fill.svg</file>
+        <file>images/disc-line.svg</file>
+        <file>images/group-fill.svg</file>
+        <file>images/group-line.svg</file>
+        <file>images/menu-fill.svg</file>
+        <file>images/menu-line.svg</file>
+    </qresource>
+    <qresource prefix="/audios"/>
+</RCC>
