@@ -55,15 +55,39 @@ bool HWidget::nativeEvent(const QByteArray &eventType, void *message, qintptr *r
     /**
      * ----------核心---------
      * ------隐藏系统边框------
-     * 当系统要画边框时，返回 0，告诉它"整个窗口都是我的客户区"
+     * 普通状态下返回 0，告诉 Windows 整个窗口都是客户区
      * 这样系统原本的标题栏和边框就在视觉上消失了
+     *
+     * ------修正最大化范围------
+     * Windows 最大化窗口时，实际窗口矩形会向工作区外扩展几个像素
+     * 无边框后这些像素也会成为客户区，导致界面边缘被屏幕或任务栏裁切
+     * 最大化时将客户区限制在当前显示器的工作区，真正全屏时则不作限制
      */
     case WM_NCCALCSIZE: {
         if (msg->wParam == TRUE) {
-            // 如果最大化，通常需要微调 resize 区域防止内容被切，这里简化处理直接 return 0 即可满足大部分需求
+            auto *params =
+                reinterpret_cast<NCCALCSIZE_PARAMS *>(msg->lParam);
+
+            const bool maximized = IsZoomed(hwnd);
+            const bool fullscreen =
+                windowState().testFlag(Qt::WindowFullScreen);
+
+            if (maximized && !fullscreen) {
+                MONITORINFO monitorInfo{};
+                monitorInfo.cbSize = sizeof(MONITORINFO);
+
+                const HMONITOR monitor =
+                    MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+
+                if (GetMonitorInfo(monitor, &monitorInfo)) {
+                    params->rgrc[0] = monitorInfo.rcWork;
+                }
+            }
+
             *result = 0;
             return true;
         }
+
         break;
     }
 
