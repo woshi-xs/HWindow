@@ -93,7 +93,7 @@ bool HWidget::nativeEvent(const QByteArray &eventType, void *message, qintptr *r
 
         // 接管鼠标行为
     case WM_NCHITTEST: {
-        const int border = 8; // 边缘缩放感应范围
+        const int border = 8 * this->devicePixelRatioF(); // 边缘缩放感应范围
         RECT winRect;
         GetWindowRect(hwnd, &winRect);
 

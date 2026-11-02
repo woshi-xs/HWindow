@@ -5,8 +5,10 @@
 HButton::HButton(QWidget *parent)
     : QAbstractButton(parent)
 {
+    //如果设置为false则状态默认为QIcon::off
     this->setCheckable(true);
-    this->setIconSize(QSize(20, 20));
+    this->setIconSize(QSize(24, 24));
+    this->setMinimumSize(40,40);
     // 开启鼠标悬停检测，否则 underMouse() 不准
     this->setAttribute(Qt::WA_Hover, true);
 }
@@ -24,6 +26,7 @@ void HButton::setIcons(const QString &normalPath, const QString &checkedPath)
 
     // 交给父类保管
     this->setIcon(dualIcon);
+    update();
 }
 
 void HButton::paintEvent(QPaintEvent *e)
@@ -33,29 +36,30 @@ void HButton::paintEvent(QPaintEvent *e)
     p.setRenderHint(QPainter::Antialiasing);
 
     // 画背景
-    QColor bgColor(Qt::transparent);
+    QColor bgColor = m_BgNormal;//正常
     if (!isEnabled()) {
-        bgColor = QColor(0, 0, 0, 20);// 禁用
+        bgColor = m_BgDisabled;// 禁用
     } else if (isDown()) {
-        bgColor = QColor(213, 213, 213);// 按下
-    } else if (isChecked()) {
-        bgColor = QColor(0, 0, 0,0);// 选中
+        bgColor = m_BgPressed;// 按下
     } else if (underMouse()) {
-        bgColor = QColor(225, 225, 225);// 仅悬停
+        bgColor = m_BgHover;// 仅悬停
+    } else if (isChecked()) {
+        bgColor = m_BgChecked;// 选中
     }
 
+    // 设置圆角裁剪区域
+    QPainterPath path;
+    path.addRoundedRect(rect(), m_nRoundRadius, m_nRoundRadius);
+    p.setClipPath(path);
+
+    // 绘制背景
     p.setBrush(bgColor);
     p.setPen(Qt::NoPen);
-    p.drawRoundedRect(rect(), roundRadius, roundRadius);
-
-    //设置圆角裁剪区域
-    QPainterPath path;
-    path.addRoundedRect(rect(), roundRadius, roundRadius);
-    p.setClipPath(path);
+    p.drawRect(rect());
 
     // 图标绘制
     if (!icon().isNull()) {
-        QRect iconRect(0, 0, iconSize().width(), iconSize().height());
+        QRect iconRect(QPoint(), iconSize());
         iconRect.moveCenter(rect().center());
 
         // 告诉 QIcon：当前按钮是可用还是禁用
@@ -64,7 +68,38 @@ void HButton::paintEvent(QPaintEvent *e)
         // 告诉 QIcon：当前按钮是选中 (On) 还是没选中 (Off)
         QIcon::State state = isChecked() ? QIcon::On : QIcon::Off;
 
-        // QIcon 会根据传的 state 自动翻出对应的 SVG 画上去
+        // QIcon 会根据传的 state 动选择 On / Off SVG
         icon().paint(&p, iconRect, Qt::AlignCenter, mode, state);
     }
 }
+
+void HButton::setBgNormal(const QColor& color)
+{
+    m_BgNormal = color;
+    update();
+}
+
+void HButton::setBgDisabled(const QColor& color)
+{
+    m_BgDisabled = color;
+    update();
+}
+
+void HButton::setBgPressed(const QColor& color)
+{
+    m_BgPressed = color;
+    update();
+}
+
+void HButton::setBgChecked(const QColor& color)
+{
+    m_BgChecked = color;
+    update();
+}
+
+void HButton::setBgHover(const QColor& color)
+{
+    m_BgHover = color;
+    update();
+}
+
