@@ -132,14 +132,8 @@ bool HWidget::nativeEvent(const QByteArray &eventType, void *message, qintptr *r
 HTitleWidget::HTitleWidget(QWidget *parent)
     : QWidget(parent)
 {
-    setAutoFillBackground(true);//启用自动背景绘制,不开启设置不了背景色
-}
-
-void HTitleWidget::setBackgroundColor(QColor BackgroundColor)
-{
-    QPalette pal = palette();
-    pal.setColor(QPalette::Window,BackgroundColor);
-    setPalette(pal);
+    // 按调色板 Window 角色铺底，不写入具体颜色，以便跟随系统深浅色
+    setAutoFillBackground(true);
 }
 
 void HTitleWidget::mouseMoveEvent(QMouseEvent *event)
